@@ -1,0 +1,115 @@
+html {
+	background-image: url(/img/bg.jpg)
+}
+
+.content {
+	margin: 50px auto;
+	padding: 10px;
+}
+
+.sudtable {
+	margin: 50px auto;
+	padding: 0px;
+	width: 441px;
+	height: 441px;
+	border: 2px solid #734854;
+	border-radius: 2px;	
+	border-collapse: separate;
+}
+
+.sudtable.solved {
+	box-shadow: 0px 0px 80px 10px gold;
+}
+
+.sudcell {
+	position: relative;
+	height: 45px;
+	width: 45px;
+	margin: 0px;
+	padding: 0px;
+	border: 1px solid #734854;
+	text-align: center;
+	color: #467bb8;
+	font-weight: bolder;
+	font-size: xx-large;
+	cursor: default;
+}
+
+.sudcell.original {
+	background-color: #736766;
+	color: #F2F2E9;
+}
+
+.sudcell.even {
+	background-color: #F2F2E9;
+}
+
+.sudcell.odd {
+	background-color: #D9D7C5;
+}
+
+.sudcell.even.badmove {
+	color: #F20505;
+	box-shadow: 0px 0px 20px 3px inset;
+}
+
+.sudcell.odd.badmove {
+	color: #F20505;
+	box-shadow: 0px 0px 20px 3px inset;
+}
+
+.sudcell.even.hinted {
+	color: green;
+	box-shadow: 0px 0px 20px 3px inset;
+}
+
+.sudcell.odd.hinted {
+	color: green;
+	box-shadow: 0px 0px 20px 3px inset;
+}
+
+.sudmaybe {
+	float:left;
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+	color: #467bb8;
+	text-align: center;
+	font-size: 8px;
+	margin: 0px;
+	padding: 0px;
+	cursor: default;
+}
+
+.sudmaybe:hover {
+	background-color: #736766;
+	font-size: 18px;
+	font-weight: bold;
+	color: #F2F2E9;
+	border-radius: 8px;
+}
+
+#buttonbox {
+	float: right;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	width: 50px;
+	border: 2px solid #736766;
+	border-radius: 3px;
+	padding: 3px;
+}
+
+#buttonbox .button {
+	color: #736766;
+	font-weight: bolder;
+	font-size: small;
+	text-align: center;
+	padding: 3px;
+	cursor: default;
+}
+
+#buttonbox .button:hover {
+	background-color: #736766;
+	color: #F2F2E9;
+}
