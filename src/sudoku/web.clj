@@ -121,7 +121,8 @@
         (check-board session))
   (GET "/" []
         (resp/redirect "/index.html"))
-  (route/resources "/"))
+  (route/resources "/")
+  (route/not-found (resp/resource-response "404.html" {:root "public/"})))
 
 (def app (-> app-routes
              wrap-json
