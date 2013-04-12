@@ -1,14 +1,26 @@
+@import url(http://fonts.googleapis.com/css?family=Sacramento);
+
 html {
 	background-image: url(/img/bg.jpg)
 }
 
 .content {
-	margin: 50px auto;
+	margin: 20px auto;
 	padding: 10px;
 }
 
+#heading {
+	margin: 5px auto;
+	min-width: 100px;
+	text-align: center;
+	font-family: 'Sacramento', cursive;
+	font-size: 100px;
+	font-weight: bolder;
+	color: #736766;
+}
+
 .sudtable {
-	margin: 50px auto;
+	margin: 20px auto;
 	padding: 0px;
 	width: 441px;
 	height: 441px;

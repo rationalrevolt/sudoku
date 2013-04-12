@@ -24,8 +24,12 @@ $(function () {
 			 		url: "/getHint"}).done(function(data) {
 				var loc = data.location;
 				var val = data.value;
+				var isSolved = data.solved;
 				var e = $("#cell" + loc[0] + loc[1]);
 				setCellValue(e,val,{hinted:true});
+				if (isSolved) {
+					solved();
+				}
 			});	
 		});
 		
@@ -41,23 +45,23 @@ $(function () {
 	}
 	
 	function refresh() {
-		$.when(
-			$.ajax({type: "POST",
-			 		url: "/getBoard"}),
-		    $.ajax({type: "POST",
-			       	url: "/getOriginals"}),
-			$.ajax({type: "POST",
-			       	url: "/getHints"}),
-			$.ajax({type: "POST",
-			       	url: "/getErrors"})       	       	
-		).done(function(r1,r2,r3,r4) {
-			createBoard(r1[0],r2[0],r3[0],r4[0]);
-		});
+		$.ajax({type: "POST",
+		 		url: "/getGameState"
+		}).done(createBoard);
 	}
 	
-	function createBoard(board,originals,hints,errors) {
+	function createBoard(data) {
 		var nums = _.range(9);
 		var table = sud_table.clone();
+		
+		var board,originals,hints,errors,isSolved;
+		
+		board = data.board;
+		originals = data.originals;
+		hints = data.hints;
+		errors = data.errors;
+		isSolved = data.solved;
+		
 		
 		$("#sudokuboard").empty();
 		$("#sudokuboard").append(table);
@@ -100,6 +104,10 @@ $(function () {
 				}
 			});
 		});
+		
+		if (isSolved) {
+			solved();
+		}
 	}
 	
 	function setCellValue(e,val,result) {

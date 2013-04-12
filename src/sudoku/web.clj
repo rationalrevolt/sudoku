@@ -32,13 +32,18 @@
   {:json-data data})
 
 (defn init-session []
-  (let [board  (sudoku/random-board)
-        solved (sudoku/solve board)]
+  (let [board    (sudoku/random-board)
+        solution (sudoku/solve board)]
     {:orig-board board
+     :originals  (sudoku/non-blank-cells board)
      :board      board
-     :solved     solved
+     :solution   solution
      :hints      #{}
-     :errors     #{}}))
+     :errors     #{}
+     :solved     false}))
+
+(defn game-state [session]
+  (dissoc session :orig-board :solution))
 
 (defn ensure-session [h]
   (fn [req]
@@ -59,62 +64,65 @@
                     (disj errors location)
                     (conj errors location))
         board     (assoc-in board location value)
+        solved    (sudoku/solved? board)
         session   (-> session
-                      (assoc-in [:board] board)
-                      (assoc-in [:errors] errors))
+                      (assoc :board board)
+                      (assoc :errors errors)
+                      (assoc :solved solved))
         resp      {:validMove (boolean valid?)
-                   :solved    (sudoku/solved? board)}]
+                   :solved    solved}]
     (-> (send-json resp)
         (assoc :session session))))
 
 (defn get-hint [session]
-  (let [board   (:board session)
-        solved  (:solved session)
-        blanks  (sudoku/blank-cells board)
-        loc     (rand-nth blanks)
-        [r c]   loc
-        val     (get-in solved loc)
-        resp    {:location loc :value val}
-        session (-> session
-                    (assoc-in [:board r c] val)
-                    (update-in [:hints] #(conj % loc)))]
+  (let [board     (:board session)
+        hints     (:hints session)
+        solution  (:solution session)
+        blanks    (sudoku/blank-cells board)
+        loc       (rand-nth blanks)
+        val       (get-in solution loc)
+        board     (assoc-in board loc val)
+        hints     (conj hints loc)
+        solved    (sudoku/solved? board)
+        resp      {:location loc :value val :solved solved}
+        session   (-> session
+                      (assoc :board board)
+                      (assoc :hints hints)
+                      (assoc :solved solved))]
     (-> (send-json resp)
         (assoc :session session))))
 
 (defn reset-board [session]
-  (let [session (-> session
-                    (assoc :board (:orig-board session))
-                    (assoc :hints #{})
-                    (assoc :errors #{}))]
+  (let [session (if (:solved session)
+                  (init-session)
+                  (-> session
+                      (assoc :board (:orig-board session))
+                      (assoc :hints #{})
+                      (assoc :errors #{})
+                      (assoc :solved false)))]
     (-> (resp/response "ok")
         (assoc :session session))))
 
 (defn check-board [session]
-  (let [board      (:board session)
-        solved     (:solved session)
-        errors     (filter (fn [loc]
-                             (let [v  (get-in board loc)
-                                   sv (get-in solved loc)]
-                               (and (pos? v) (not= v sv))))
-                           sudoku/all-locations)
-        errors     (set errors)
-        session    (assoc session :errors errors)]
+  (let [board     (:board session)
+        solution  (:solution session)
+        errors    (filter (fn [loc]
+                            (let [v  (get-in board loc)
+                                  sv (get-in solution loc)]
+                              (and (pos? v) (not= v sv))))
+                          sudoku/all-locations)
+        errors    (set errors)
+        session   (assoc session :errors errors)]
     (-> (resp/response "ok")
         (assoc :session session))))
 
 (defroutes app-routes
-  (POST "/getBoard" {:keys [session]}
-        (send-json (:board session)))
-  (POST "/getOriginals" {:keys [session]}
-        (send-json (sudoku/non-blank-cells (:orig-board session))))
+  (POST "/getGameState" {:keys [session]}
+        (send-json (game-state session)))
   (POST "/updateBoard" {:keys [session json-data]}
         (update-board json-data session))
   (POST "/getHint" {:keys [session]}
         (get-hint session))
-  (POST "/getHints" {:keys [session]}
-        (send-json (:hints session)))
-  (POST "/getErrors" {:keys [session]}
-        (send-json (:errors session)))
   (POST "/resetBoard" {:keys [session]}
         (reset-board session))
   (POST "/checkBoard" {:keys [session]}
