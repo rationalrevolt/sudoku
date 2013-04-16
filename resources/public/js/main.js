@@ -5,19 +5,7 @@ $(function () {
 	var sud_maybecell = $("<div class='sudmaybe'></div>");
 	
 	init();
-	
-	function contains(arr,e) {
-		var i,v;
 		
-		for(i=0;i<arr.length;i++) {
-			v = arr[i];
-			if (e[0] === v[0] && e[1] === v[1]) 
-			return true;
-		}
-		
-		return false;
-	}
-	
 	function init() {
 		$("#hint").click(function() {
 			$.ajax({type: "POST",
@@ -42,6 +30,18 @@ $(function () {
 		});
 		
 		refresh();
+	}
+	
+	function contains(arr,e) {
+		var i,v;
+		
+		for(i=0;i<arr.length;i++) {
+			v = arr[i];
+			if (e[0] === v[0] && e[1] === v[1]) 
+			return true;
+		}
+		
+		return false;
 	}
 	
 	function refresh() {
@@ -107,6 +107,8 @@ $(function () {
 		
 		if (isSolved) {
 			solved();
+		} else {
+			$("#hint,#check").show();
 		}
 	}
 	
@@ -163,5 +165,6 @@ $(function () {
 	function solved() {
 		$(".sudtable").addClass("solved");
 		$(".sudcell").removeClass("original hinted even odd").off("click");
+		$("#hint,#check").hide();
 	}
 });

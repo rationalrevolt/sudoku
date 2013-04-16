@@ -16,7 +16,7 @@
                           (content-type "application/json")
                           (assoc :body (json/encode data))))
           ctype     (:content-type req)]
-      (if (= ctype "application/json")
+      (if (and ctype (.startsWith ctype "application/json"))
         (with-open [r (reader (:body req))]
           (let [req (assoc req :json-data (json/decode-stream r true))
                 res (h req)]
