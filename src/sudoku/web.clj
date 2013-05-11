@@ -134,7 +134,9 @@
            (GET "/" []
                 (send-to "index.html"))
            (GET "" []
-                (send-to "index.html")))
+                (send-to "index.html"))
+           (route/not-found 
+                (send-to "404.html")))
   (route/resources "/")
   (route/not-found (send-to "404.html")))
 
