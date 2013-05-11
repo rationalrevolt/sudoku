@@ -116,21 +116,27 @@
     (-> (resp/response "ok")
         (assoc :session session))))
 
+(defn send-to [loc]
+  (resp/resource-response loc {:root "public/"}))
+
 (defroutes app-routes
-  (POST "/getGameState" {:keys [session]}
-        (send-json (game-state session)))
-  (POST "/updateBoard" {:keys [session json-data]}
-        (update-board json-data session))
-  (POST "/getHint" {:keys [session]}
-        (get-hint session))
-  (POST "/resetBoard" {:keys [session]}
-        (reset-board session))
-  (POST "/checkBoard" {:keys [session]}
-        (check-board session))
-  (GET "/" []
-        (resp/redirect "/index.html"))
+  (context "/sudoku" []
+           (POST "/getGameState" {:keys [session]}
+                 (send-json (game-state session)))
+           (POST "/updateBoard" {:keys [session json-data]}
+                 (update-board json-data session))
+           (POST "/getHint" {:keys [session]}
+                 (get-hint session))
+           (POST "/resetBoard" {:keys [session]}
+                 (reset-board session))
+           (POST "/checkBoard" {:keys [session]}
+                 (check-board session))
+           (GET "/" []
+                (send-to "index.html"))
+           (GET "" []
+                (send-to "index.html")))
   (route/resources "/")
-  (route/not-found (resp/resource-response "404.html" {:root "public/"})))
+  (route/not-found (send-to "404.html")))
 
 (def app (-> app-routes
              wrap-json

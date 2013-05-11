@@ -9,7 +9,7 @@ $(function () {
 	function init() {
 		$("#hint").click(function() {
 			$.ajax({type: "POST",
-			 		url: "/getHint"}).done(function(data) {
+			 		url: "/sudoku/getHint"}).done(function(data) {
 				var loc = data.location;
 				var val = data.value;
 				var isSolved = data.solved;
@@ -22,11 +22,11 @@ $(function () {
 		});
 		
 		$("#check").click(function() {
-			$.ajax({type: "POST", url: "/checkBoard"}).done(refresh);	
+			$.ajax({type: "POST", url: "/sudoku/checkBoard"}).done(refresh);	
 		});
 		
 		$("#reset").click(function() {
-			$.ajax({type: "POST", url: "/resetBoard"}).done(refresh);
+			$.ajax({type: "POST", url: "/sudoku/resetBoard"}).done(refresh);
 		});
 		
 		refresh();
@@ -46,7 +46,7 @@ $(function () {
 	
 	function refresh() {
 		$.ajax({type: "POST",
-		 		url: "/getGameState"
+		 		url: "/sudoku/getGameState"
 		}).done(createBoard);
 	}
 	
@@ -152,7 +152,7 @@ $(function () {
 	function sendSelection(e,val) {
 		$.ajax({type: "POST",
 				contentType: "application/json",
-				url: "/updateBoard",
+				url: "/sudoku/updateBoard",
 				data: JSON.stringify({location: e.data().loc, value: val})
 		}).done(function(result) {
 			setCellValue(e,val,result);
