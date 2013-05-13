@@ -1,9 +1,7 @@
 (ns sudoku.web
-  (:use [clojure.java.io :only (reader)]
-        compojure.core
-        [ring.util.response :only (content-type response)]
-        ring.adapter.jetty)
-  (:require [compojure.handler :as handler]
+  (:use compojure.core)
+  (:require [clojure.java.io :as io]
+            [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.util.response :as resp]
             [cheshire.core :as json]
@@ -13,11 +11,11 @@
   (fn [req]
     (let [json-resp (fn [res data]
                       (-> res
-                          (content-type "application/json")
+                          (resp/content-type "application/json")
                           (assoc :body (json/encode data))))
           ctype     (:content-type req)]
       (if (and ctype (.startsWith ctype "application/json"))
-        (with-open [r (reader (:body req))]
+        (with-open [r (io/reader (:body req))]
           (let [req (assoc req :json-data (json/decode-stream r true))
                 res (h req)]
             (if-let [data (:json-data res)]
@@ -117,30 +115,31 @@
         (assoc :session session))))
 
 (defn send-to [loc]
-  (resp/resource-response loc {:root "public/"}))
+  (io/resource (str "public/" loc)))
+
+(def sudoku-routes
+  (-> (context "/sudoku" []
+               (POST "/getGameState" {:keys [session]}
+                     (send-json (game-state session)))
+               (POST "/updateBoard" {:keys [session json-data]}
+                     (update-board json-data session))
+               (POST "/getHint" {:keys [session]}
+                     (get-hint session))
+               (POST "/resetBoard" {:keys [session]}
+                     (reset-board session))
+               (POST "/checkBoard" {:keys [session]}
+                     (check-board session))
+               (GET "/" []
+                    (send-to "index.html"))
+               (GET "" []
+                    (send-to "index.html")))
+      ensure-session))
 
 (defroutes app-routes
-  (context "/sudoku" []
-           (POST "/getGameState" {:keys [session]}
-                 (send-json (game-state session)))
-           (POST "/updateBoard" {:keys [session json-data]}
-                 (update-board json-data session))
-           (POST "/getHint" {:keys [session]}
-                 (get-hint session))
-           (POST "/resetBoard" {:keys [session]}
-                 (reset-board session))
-           (POST "/checkBoard" {:keys [session]}
-                 (check-board session))
-           (GET "/" []
-                (send-to "index.html"))
-           (GET "" []
-                (send-to "index.html"))
-           (route/not-found 
-                (send-to "404.html")))
   (route/resources "/")
+  sudoku-routes
   (route/not-found (send-to "404.html")))
 
 (def app (-> app-routes
              wrap-json
-             ensure-session
              handler/site))
