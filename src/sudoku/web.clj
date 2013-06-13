@@ -29,16 +29,18 @@
 (defn send-json [data]
   {:json-data data})
 
-(defn init-session []
-  (let [board    (sudoku/random-board)
-        solution (sudoku/solve board)]
-    {:orig-board board
-     :originals  (sudoku/non-blank-cells board)
-     :board      board
-     :solution   solution
-     :hints      #{}
-     :errors     #{}
-     :solved     false}))
+(defn init-session
+  ([] (init-session :moderate))
+  ([level] (let [board    (sudoku/random-board level)
+                 solution (sudoku/solve board)]
+             {:orig-board board
+              :originals  (sudoku/non-blank-cells board)
+              :board      board
+              :solution   solution
+              :difficulty level
+              :hints      #{}
+              :errors     #{}
+              :solved     false})))
 
 (defn game-state [session]
   (dissoc session :orig-board :solution))
@@ -91,13 +93,18 @@
         (assoc :session session))))
 
 (defn reset-board [session]
-  (let [session (if (:solved session)
-                  (init-session)
-                  (-> session
-                      (assoc :board (:orig-board session))
-                      (assoc :hints #{})
-                      (assoc :errors #{})
-                      (assoc :solved false)))]
+  (let [session (-> session
+                    (assoc :board (:orig-board session))
+                    (assoc :hints #{})
+                    (assoc :errors #{})
+                    (assoc :solved false))]
+    (-> (resp/response "ok")
+        (assoc :session session))))
+
+(defn new-game [json-data session]
+  (let [level   (:difficulty json-data)
+        level   (keyword level)
+        session (init-session level)]
     (-> (resp/response "ok")
         (assoc :session session))))
 
@@ -119,9 +126,11 @@
 
 (def sudoku-routes
   (-> (context "/sudoku" []
+               (POST "/newGame" {:keys [json-data session]}
+                     (new-game json-data session))
                (POST "/getGameState" {:keys [session]}
                      (send-json (game-state session)))
-               (POST "/updateBoard" {:keys [session json-data]}
+               (POST "/updateBoard" {:keys [json-data session]}
                      (update-board json-data session))
                (POST "/getHint" {:keys [session]}
                      (get-hint session))

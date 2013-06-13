@@ -112,7 +112,18 @@ html {
 	padding: 3px;
 }
 
-#buttonbox .button {
+#difficulty {
+	float: left;
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	width: 80px;
+	border: 2px solid #736766;
+	border-radius: 3px;
+	padding: 3px;
+}
+
+.button {
 	color: #736766;
 	font-weight: bolder;
 	font-size: small;
@@ -121,7 +132,17 @@ html {
 	cursor: default;
 }
 
-#buttonbox .button:hover {
+.button:hover {
 	background-color: #736766;
 	color: #F2F2E9;
+}
+
+.boxtitle {
+	background-color: #734854;
+	color: #F2F2E9;
+	font-weight: bolder;
+	font-size: small;
+	text-align: center;
+	padding: 3px;
+	cursor: default;	
 }

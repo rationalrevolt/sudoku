@@ -130,8 +130,8 @@
 
 (def difficulty
   {:easy     [3 5]
-   :moderate [5 6]
-   :hard     [6 7]})
+   :moderate [3 6]
+   :hard     [4 6]})
 
 (defn- n->cell [n]
   (let [row #(quot % n)

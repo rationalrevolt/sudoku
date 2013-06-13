@@ -28,6 +28,13 @@ $(function () {
 		$("#reset").click(function() {
 			$.ajax({type: "POST", url: "/sudoku/resetBoard"}).done(refresh);
 		});
+
+		$("#difficulty > .button").click(function() {
+			$.ajax({type: "POST", 
+				    url: "/sudoku/newGame",
+				    contentType: "application/json",
+				    data: JSON.stringify({difficulty: this.id})}).done(refresh);
+		});
 		
 		refresh();
 	}
