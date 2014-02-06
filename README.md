@@ -8,6 +8,10 @@ A very simple browser based Sudoku game written in Clojure and jQuery
 2. Clone this repository, and from the base directory run: lein ring server-headless  
 3. Open up a browser and navigate to [http://localhost:3000/][2]  
 
+## Screenshot
+
+![sudoku](pics/sudoku.png)
+
 ## Try it online
 [http://apps.defsym.me/sudoku][3]
 
